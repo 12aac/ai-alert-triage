@@ -1,0 +1,13 @@
+{
+  "alerts_total": 1000,
+  "true_positives": 50,
+  "false_positives": 50,
+  "false_negatives": 0,
+  "true_negatives": 900,
+  "precision": 0.5,
+  "recall": 1.0,
+  "f1": 0.667,
+  "false_positive_rate": 0.053,
+  "fp_suppression_rate": 0.526,
+  "analyst_workload_reduction": 0.9
+}
