@@ -886,16 +886,16 @@
 <text x="64" y="88" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#38BDF8" letter-spacing="5">SOC &#183; DETECTION ENGINEERING</text>
 <text x="60" y="150" font-size="56" font-weight="bold" fill="#E7EEF7" letter-spacing="1">AI Alert Triage</text>
 <text x="64" y="184" font-family="DejaVu Sans Mono, monospace" font-size="15" fill="#7C8DA6" letter-spacing="1">Isolation Forest pre-filter &#183; Claude API classification</text>
-<rect x="64" y="568" width="125" height="34" rx="17" fill="#34D399" opacity="0.10"/>
-<rect x="64" y="568" width="125" height="34" rx="17" fill="none" stroke="#34D399" stroke-width="1" opacity="0.55"/>
+<rect x="64" y="568" width="217" height="34" rx="17" fill="#34D399" opacity="0.10"/>
+<rect x="64" y="568" width="217" height="34" rx="17" fill="none" stroke="#34D399" stroke-width="1" opacity="0.55"/>
 <circle cx="82" cy="585" r="4" fill="#34D399"/>
-<text x="96" y="590" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#E7EEF7" letter-spacing="1">RECALL 1.00</text>
-<rect x="205" y="568" width="180" height="34" rx="17" fill="#38BDF8" opacity="0.10"/>
-<rect x="205" y="568" width="180" height="34" rx="17" fill="none" stroke="#38BDF8" stroke-width="1" opacity="0.55"/>
-<circle cx="223" cy="585" r="4" fill="#38BDF8"/>
-<text x="237" y="590" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#E7EEF7" letter-spacing="1">FP SUPPRESSED 53%</text>
-<rect x="402" y="568" width="144" height="34" rx="17" fill="#F5B445" opacity="0.10"/>
-<rect x="402" y="568" width="144" height="34" rx="17" fill="none" stroke="#F5B445" stroke-width="1" opacity="0.55"/>
-<circle cx="420" cy="585" r="4" fill="#F5B445"/>
-<text x="434" y="590" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#E7EEF7" letter-spacing="1">WORKLOAD −90%</text>
+<text x="96" y="590" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#E7EEF7" letter-spacing="1">UNSW-NB15 · 60K FLOWS</text>
+<rect x="297" y="568" width="208" height="34" rx="17" fill="#38BDF8" opacity="0.10"/>
+<rect x="297" y="568" width="208" height="34" rx="17" fill="none" stroke="#38BDF8" stroke-width="1" opacity="0.55"/>
+<circle cx="315" cy="585" r="4" fill="#38BDF8"/>
+<text x="329" y="590" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#E7EEF7" letter-spacing="1">PRECISION 0.32 TUNED</text>
+<rect x="521" y="568" width="144" height="34" rx="17" fill="#F5B445" opacity="0.10"/>
+<rect x="521" y="568" width="144" height="34" rx="17" fill="none" stroke="#F5B445" stroke-width="1" opacity="0.55"/>
+<circle cx="539" cy="585" r="4" fill="#F5B445"/>
+<text x="553" y="590" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#E7EEF7" letter-spacing="1">WORKLOAD −87%</text>
 </svg>

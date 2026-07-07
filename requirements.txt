@@ -4,3 +4,10 @@ scikit-learn>=1.3
 anthropic>=0.40
 python-dotenv>=1.0
 streamlit>=1.30
+plotly>=5.18
+pyyaml>=6.0
+requests>=2.31
+
+# Optional — only needed for the SIEM connectors:
+# elasticsearch>=8.0      # connectors/elastic.py
+# splunk-sdk>=1.7         # connectors/splunk.py

@@ -14,6 +14,7 @@ Run:  python -m src.pipeline
 """
 
 import json
+import os
 
 import pandas as pd
 
@@ -23,11 +24,17 @@ from src.metrics import compute_metrics, format_report
 from src.ticketing import write_tickets
 
 
-def run_pipeline(csv_path: str = "data/sample_alerts.csv") -> pd.DataFrame:
-    df = pd.read_csv(csv_path)
+def run_pipeline(source="data/sample_alerts.csv", write_files: bool = True,
+                 cfg: Stage1Config = None) -> pd.DataFrame:
+    """Run the full triage flow.
+
+    `source` may be a CSV path (str) or an already-loaded DataFrame.
+    `cfg` tunes Stage 1 (e.g. contamination for a dataset's real attack rate).
+    """
+    df = source.copy() if isinstance(source, pd.DataFrame) else pd.read_csv(source)
 
     # ---- Stage 1: route everything cheaply ----
-    df = run_stage1(df, Stage1Config())
+    df = run_stage1(df, cfg or Stage1Config())
 
     # ---- Stage 2: only the ambiguous 'review' alerts hit the LLM ----
     final_decisions, rationales, actions, sources = [], [], [], []
@@ -50,17 +57,27 @@ def run_pipeline(csv_path: str = "data/sample_alerts.csv") -> pd.DataFrame:
     df["recommended_action"] = actions
     df["source"] = sources
 
+    # ---- Explainability: which features drove each alert's score ----
+    from src.explain import add_explanations
+    df = add_explanations(df)
+
     # ---- Reporting ----
     metrics = compute_metrics(df)
-    with open("outputs/metrics.json", "w") as fh:
-        json.dump(metrics, fh, indent=2)
-    print(format_report(metrics))
+    if write_files:
+        os.makedirs("outputs", exist_ok=True)
+        with open("outputs/metrics.json", "w") as fh:
+            json.dump(metrics, fh, indent=2)
+        n = write_tickets(df.to_dict("records"))
+        df.to_csv("outputs/triaged_alerts.csv", index=False)
 
-    # ---- Tickets for Project 3 ----
-    n = write_tickets(df.to_dict("records"))
-    print(f"Wrote {n} tickets to outputs/tickets.json")
+        from src.report import write_report
+        src_name = source if isinstance(source, str) else "DataFrame input"
+        rpt = write_report(df, source_name=src_name)
 
-    df.to_csv("outputs/triaged_alerts.csv", index=False)
+        print(format_report(metrics))
+        print(f"Wrote {n} tickets to outputs/tickets.json")
+        print(f"Wrote analyst report to {rpt}")
+
     return df
 
 

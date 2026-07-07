@@ -24,10 +24,36 @@ CLEARED_STATES = {"auto_suppress", "false_positive"}
 
 
 def compute_metrics(df: pd.DataFrame) -> dict:
-    """df must have 'label' (ground truth) and 'final_decision'."""
-    y_true = df["label"].astype(int)
+    """Compute triage metrics. Detection-quality metrics (precision/recall/F1,
+    confusion counts) require a 'label' ground-truth column; if it's absent
+    (e.g. live SIEM data), those come back as None and only the operational
+    metrics (workload reduction, lane breakdown) are returned."""
     flagged = df["final_decision"].isin(FLAGGED_STATES).astype(int)
+    has_labels = "label" in df.columns
 
+    # Operational metrics — always available, no labels needed.
+    handled_without_human = df["final_decision"].isin(
+        {"auto_suppress", "false_positive"}).sum()
+    workload_reduction = handled_without_human / len(df) if len(df) else 0.0
+
+    out = {
+        "alerts_total": len(df),
+        "analyst_workload_reduction": round(workload_reduction, 3),
+        "flagged_for_human": int(flagged.sum()),
+        "has_labels": has_labels,
+    }
+
+    if not has_labels:
+        # No ground truth: detection quality is undefined.
+        out.update({
+            "precision": None, "recall": None, "f1": None,
+            "false_positive_rate": None, "fp_suppression_rate": None,
+            "true_positives": None, "false_positives": None,
+            "false_negatives": None, "true_negatives": None,
+        })
+        return out
+
+    y_true = df["label"].astype(int)
     tp = int(((flagged == 1) & (y_true == 1)).sum())
     fp = int(((flagged == 1) & (y_true == 0)).sum())
     fn = int(((flagged == 0) & (y_true == 1)).sum())
@@ -46,12 +72,7 @@ def compute_metrics(df: pd.DataFrame) -> dict:
     fp_suppression_rate = (auto_suppressed_benign / benign_total
                            if benign_total else 0.0)
 
-    handled_without_human = df["final_decision"].isin(
-        {"auto_suppress", "false_positive"}).sum()
-    workload_reduction = handled_without_human / len(df) if len(df) else 0.0
-
-    return {
-        "alerts_total": len(df),
+    out.update({
         "true_positives": tp, "false_positives": fp,
         "false_negatives": fn, "true_negatives": tn,
         "precision": round(precision, 3),
@@ -59,11 +80,19 @@ def compute_metrics(df: pd.DataFrame) -> dict:
         "f1": round(f1, 3),
         "false_positive_rate": round(false_positive_rate, 3),
         "fp_suppression_rate": round(fp_suppression_rate, 3),
-        "analyst_workload_reduction": round(workload_reduction, 3),
-    }
+    })
+    return out
 
 
 def format_report(m: dict) -> str:
+    if not m.get("has_labels", True):
+        return (
+            "=== Alert Triage Metrics (no ground-truth labels) ===\n"
+            f"Alerts processed:            {m['alerts_total']}\n"
+            f"Flagged for analyst:         {m['flagged_for_human']}\n"
+            f"Analyst workload reduction:  {m['analyst_workload_reduction']}\n"
+            "(precision/recall need labelled data)\n"
+        )
     return (
         "=== Alert Triage Metrics ===\n"
         f"Alerts processed:            {m['alerts_total']}\n"

@@ -24,8 +24,11 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 
-# Numeric columns the model learns from. Keep in sync with your data.
-FEATURES = ["duration", "src_bytes", "dst_bytes", "pkt_count", "failed_logins"]
+# Numeric columns the model learns from. This is a *superset*: run_stage1 uses
+# whichever of these are actually present, so it works on synthetic data (first
+# five) and on richer real data (e.g. UNSW-NB15 adds TTL/load/state features).
+FEATURES = ["duration", "src_bytes", "dst_bytes", "pkt_count", "failed_logins",
+            "src_ttl", "dst_ttl", "src_load", "dst_load", "state_ttl_count"]
 
 
 @dataclass
@@ -37,10 +40,23 @@ class Stage1Config:
 
 
 def run_stage1(df: pd.DataFrame, cfg: Stage1Config = Stage1Config()) -> pd.DataFrame:
-    """Adds 'anomaly_score' and 'stage1_decision' columns to a copy of df."""
+    """Adds 'anomaly_score' and 'stage1_decision' columns to a copy of df.
+
+    Robust to real-world data: uses whichever of the expected FEATURES are
+    actually present (real SIEM exports rarely have every field), as long as
+    at least two numeric features exist.
+    """
     df = df.copy()
 
-    X = StandardScaler().fit_transform(df[FEATURES].values)
+    feats = [c for c in FEATURES if c in df.columns]
+    if len(feats) < 2:
+        raise ValueError(
+            f"Need at least 2 of these numeric features to score alerts: "
+            f"{FEATURES}. Found: {feats}. Check your column mapping."
+        )
+    has_logins = "failed_logins" in df.columns
+
+    X = StandardScaler().fit_transform(df[feats].astype(float).values)
     model = IsolationForest(
         contamination=cfg.contamination,
         random_state=42,
@@ -58,8 +74,9 @@ def run_stage1(df: pd.DataFrame, cfg: Stage1Config = Stage1Config()) -> pd.DataF
     high = np.percentile(df["anomaly_score"], cfg.escalate_pct)
 
     def route(row):
-        # Hard rule first: a brute-force burst is never "suppressed".
-        if row["failed_logins"] >= cfg.failed_login_rule:
+        # Hard rule first: a brute-force burst is never "suppressed"
+        # (only when the data actually has a failed_logins field).
+        if has_logins and row["failed_logins"] >= cfg.failed_login_rule:
             return "escalate"
         if row["anomaly_score"] <= low:
             return "auto_suppress"

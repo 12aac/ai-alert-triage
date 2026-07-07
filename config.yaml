@@ -1,0 +1,16 @@
+# AI Alert Triage — central configuration
+# Override any value here instead of editing code.
+
+stage1:
+  contamination: 0.05      # expected attack fraction (UNSW-NB15 ≈ 0.03)
+  suppress_pct: 50         # bottom X% of scores -> auto_suppress
+  escalate_pct: 95         # top (100-X)% -> escalate
+  failed_login_rule: 10    # >= this many failed logins always escalates
+
+stage2:
+  model: claude-haiku-4-5-20251001   # TRIAGE_MODEL in .env overrides this
+  max_tokens: 300
+
+paths:
+  sample_data: data/sample_alerts.csv
+  outputs_dir: outputs

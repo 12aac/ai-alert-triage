@@ -1,5 +1,22 @@
+# Secrets — NEVER commit your real API key
+.env
+
+# Python
 venv/
+.venv/
 __pycache__/
 *.pyc
-.env
+*.pyo
+.ipynb_checkpoints/
+
+# Generated outputs (keep the folder, ignore its contents)
+outputs/*
+!outputs/.gitkeep
+
+# Large raw datasets — commit only small samples
 data/raw/
+
+# OS / editor noise
+.DS_Store
+.vscode/
+.idea/
