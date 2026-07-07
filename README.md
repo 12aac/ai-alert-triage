@@ -74,6 +74,12 @@ metrics are simply skipped.
 
 ## Dashboard
 
+![Dashboard overview](docs/screenshot-overview.png)
+*Overview: metric cards and decision breakdown on real UNSW-NB15 data.*
+
+![Anomaly scores](docs/screenshot-scores.png)
+*Anomaly-score distribution with the suppress / review / escalate routing bands.*
+
 A themed Streamlit dashboard (`streamlit run app/dashboard.py`) with:
 - a **source switcher** (synthetic / upload / Elasticsearch),
 - metric cards, and
@@ -170,5 +176,10 @@ ai-alert-triage/
 3. **security-ticket-workflow** — ServiceNow / Jira incident workflow
 
 ---
+
+## License & security
+
+MIT licensed — see [LICENSE](LICENSE). Security assumptions and limitations
+are documented openly in [SECURITY.md](SECURITY.md).
 
 <sub>This project uses the Claude API by Anthropic for AI-driven alert classification. Claude is a trademark of Anthropic.</sub>

@@ -77,6 +77,9 @@ with st.sidebar:
         es_cfg["index"] = st.text_input("Index", "unsw-nb15-*")
         es_cfg["api_key"] = st.text_input("API key", type="password")
         es_cfg["size"] = st.number_input("Max docs", 100, 10000, 1000, step=100)
+        es_cfg["verify"] = st.checkbox(
+            "Verify TLS certificate", value=True,
+            help="Uncheck only for lab clusters with self-signed certs.")
 
     run = st.button("Run triage", type="primary", use_container_width=True)
     st.divider()
@@ -133,7 +136,8 @@ def load_source() -> pd.DataFrame:
     try:
         return fetch_alerts(host=es_cfg["host"], index=es_cfg["index"],
                             api_key=es_cfg["api_key"] or None,
-                            size=int(es_cfg["size"]))
+                            size=int(es_cfg["size"]),
+                            verify_certs=es_cfg.get("verify", True))
     except Exception as exc:
         st.error(f"Elasticsearch fetch failed: {exc}")
         st.stop()

@@ -65,9 +65,13 @@ def fetch_alerts(
     size: int = 1000,
     query: dict = None,
     field_map: dict = None,
-    verify_certs: bool = False,
+    verify_certs: bool = True,
 ) -> pd.DataFrame:
     """Query Elasticsearch and return a DataFrame in the pipeline's schema.
+
+    TLS certificates are verified by default. For lab clusters with
+    self-signed certs, explicitly pass verify_certs=False (and accept the
+    man-in-the-middle risk on that connection).
 
     Falls back to environment variables when arguments are omitted:
         ELASTIC_HOST, ELASTIC_INDEX, ELASTIC_API_KEY,
